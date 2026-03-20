@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rihanix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0d0f;
+      --surface:   #111416;
+      --border:    #1e2226;
+      --gold:      #c9a84c;
+      --gold-dim:  #7a6130;
+      --text:      #e8e2d6;
+      --muted:     #5a5850;
+      --accent:    #4c8ec9;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.45;
+    }
+
+    /* ── Grid lines background ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.6rem 3rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      background: rgba(11,13,15,0.75);
+    }
+
+    .nav-logo {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--text); font-weight: 300; }
+
+    nav ul {
+      list-style: none;
+      display: flex; gap: 2.5rem;
+    }
+
+    nav ul a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      overflow: hidden;
+    }
+
+    /* Orbiting ring decoration */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      pointer-events: none;
+      animation: spin linear infinite;
+    }
+    .ring-1 {
+      width: 520px; height: 520px;
+      border-color: var(--gold-dim);
+      opacity: 0.2;
+      animation-duration: 40s;
+    }
+    .ring-2 {
+      width: 720px; height: 720px;
+      opacity: 0.1;
+      animation-duration: 70s;
+      animation-direction: reverse;
+    }
+    .ring-3 {
+      width: 980px; height: 980px;
+      opacity: 0.06;
+      animation-duration: 120s;
+    }
+
+    .ring::after {
+      content: '';
+      position: absolute;
+      top: -3px; left: 50%;
+      transform: translateX(-50%);
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-title {
+      font-size: clamp(3.8rem, 9vw, 8rem);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.4s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      margin-top: 2rem;
+      max-width: 520px;
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.6s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex; gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.8s forwards;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--bg);
+      border: 1px solid var(--gold);
+    }
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--gold);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Scroll indicator ── */
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.2s forwards;
+    }
+
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.2); }
+    }
+
+    /* ── STATS BAR ── */
+    .stats {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat {
+      padding: 2.5rem 3rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-value {
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ── FEATURES ── */
+    .section {
+      position: relative; z-index: 1;
+      padding: 6rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .feature {
+      background: var(--surface);
+      padding: 2.5rem;
+      transition: background 0.25s;
+    }
+    .feature:hover { background: #161a1d; }
+
+    .feature-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-title {
+      font-size: 1.35rem;
+      font-weight: 400;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+
+    .feature-desc {
+      font-size: 0.95rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ── FORMULA SECTION ── */
+    .formula-section {
+      position: relative; z-index: 1;
+      padding: 5rem 3rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .formula {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      margin: 1.5rem 0;
+      opacity: 0.85;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      padding: 2.5rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Riha<span>nix</span></a>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#features">Courses</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="about">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+
+    <p class="hero-eyebrow">Mathematics &amp; Physics Education</p>
+
+    <h1 class="hero-title">
+      Learn with<br><em>precision.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Rigorous courses in mathematics and physics — from middle school fundamentals
+      to advanced baccalaureate topics, across French, Arabic, and Italian.
+    </p>
+
+    <div class="hero-cta">
+      <a href="#features" class="btn btn-primary">Explore Courses</a>
+      <a href="#contact"  class="btn btn-ghost">Get in touch</a>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      scroll
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats" id="features">
+    <div class="stat">
+      <div class="stat-value">3</div>
+      <div class="stat-label">Languages — FR · AR · IT</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">∞</div>
+      <div class="stat-label">Practice Exercises</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Curriculum Aligned</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section">
+    <p class="section-label">What we offer</p>
+    <h2 class="section-title">Structured learning,<br><em>beautifully delivered.</em></h2>
+
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-num">01</div>
+        <div class="feature-title">Algebra & Analysis</div>
+        <div class="feature-desc">Functions, sequences, limits, derivatives — taught with rigour and visual clarity from first principles.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">02</div>
+        <div class="feature-title">Geometry</div>
+        <div class="feature-desc">Euclidean and analytic geometry, proofs, and construction — building spatial intuition step by step.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">03</div>
+        <div class="feature-title">Arithmetic</div>
+        <div class="feature-desc">Divisibility, congruences, number theory — the foundation of mathematical thinking at every level.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">04</div>
+        <div class="feature-title">Physics</div>
+        <div class="feature-desc">Mechanics, optics, electricity — bridging theory and experiment with clear notation and worked examples.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">05</div>
+        <div class="feature-title">Exam Prep</div>
+        <div class="feature-desc">Targeted practice sets, timed sessions, and detailed corrections calibrated to baccalaureate standards.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">06</div>
+        <div class="feature-title">Multilingual</div>
+        <div class="feature-desc">Full course materials in French, Arabic, and Italian — same rigour, adapted to each curriculum.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULA BANNER -->
+  <div class="formula-section">
+    <p class="section-label">Our philosophy</p>
+    <p class="formula">∀ ε &gt; 0,  ∃ δ &gt; 0  :  |x − a| &lt; δ  ⟹  |f(x) − L| &lt; ε</p>
+    <p style="color:var(--muted); font-size:1rem; font-weight:300; font-style:italic;">
+      Every concept has a precise definition. We teach that definition.
+    </p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <p>© 2026 Rihanix — All rights reserved</p>
+    <p>contact@rihanix.com</p>
+  </footer>
+
+</body>
+</html>
